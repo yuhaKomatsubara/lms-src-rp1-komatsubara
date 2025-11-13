@@ -23,7 +23,8 @@
 
 			<form th:action="@{/attendance/update}" method="post">
 				<table class="table table-hover dataTable no-footer">
-					<thead>
+					<!--Take.29 勤怠入力画面スクロール-->
+					<thead style="display: block;">
 						<tr>
 							<th class="w140">日付</th>
 							<th class="w300">コース内容</th>
@@ -34,7 +35,9 @@
 							<th class="w240">備考</th>
 						</tr>
 					</thead>
-					<tbody>
+					
+					<!--Take.29 勤怠入力画面スクロール-->
+					<tbody style="display: block; overflow-y: scroll; height: 550px;">
 						<th:block th:each="dailyAttendanceForm, stat : *{attendanceForm.attendanceList}">
 							<tr>
 								<th:block>

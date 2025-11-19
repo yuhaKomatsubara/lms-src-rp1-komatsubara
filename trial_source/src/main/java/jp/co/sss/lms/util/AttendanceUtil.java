@@ -22,6 +22,8 @@ public class AttendanceUtil {
 	private DateUtil dateUtil;
 	@Autowired
 	private MSectionMapper mSectionMapper;
+	@Autowired //Task.26 小松原 2025/11/19
+	TrainingTime trainingTime;
 
 	/**
 	 * SSS定時・出退勤時間を元に、遅刻早退を判定をする
@@ -146,5 +148,64 @@ public class AttendanceUtil {
 		}
 		return false;
 	}
+	
+	/**
+	 * Task.26 時間のマップ
+	 * 小松原　2025/11/18
+	 */
+	public LinkedHashMap<Integer,String>setHourTime(){
+		LinkedHashMap<Integer,String>hourTime = new LinkedHashMap<>();
+		hourTime.put(null, "");
+		for(int i = 0;i<24;i++) {
+			hourTime.put(i,String.format("%02d", i));
+		}
+		return hourTime;
+	}
+	
+	/**
+	 * Task.26 分のマップ
+	 * 小松原　2025/11/18
+	 */
+	public LinkedHashMap<Integer,String>setMinuteTime(){
+		LinkedHashMap<Integer,String>miniteTime = new LinkedHashMap<>();
+		miniteTime.put(null, "");
+		for(int i = 0;i<60;i++) {
+			miniteTime.put(i,String.format("%02d", i));
+		}
+		return miniteTime;
+	}
+	
+	/**
+	 * Task.26 時間だけを切り出す
+	 * 小松原　2025/11/18
+	 */
+	public String getHour(String trainingTimeHoure) {
+	    if (trainingTimeHoure == null || trainingTimeHoure.isEmpty()) {
+	        return null;
+	    }
+//	    return Integer.parseInt(trainingTime.substring(0, 2));
+	    return trainingTimeHoure.substring(0, 2);
+	}
 
+	
+	/**
+	 * Task.26 分だけを切り出す
+	 * 小松原　2025/11/18
+	 */
+	public String getMinute(String trainingTimeMinute) {
+		//nullや空文字、スペースはnull
+		if(trainingTimeMinute == null || trainingTimeMinute.isEmpty()) {
+			return null;
+		}
+//		return Integer.parseInt(trainingTime.substring(trainingTime.length()-2));
+		return trainingTimeMinute.substring(trainingTimeMinute.length()-2);
+	}
+	
+	/**
+	 * Task.26 受講時間を算出
+	 * 小松原　2025/11/19
+	 */
+//	public TrainingTime calcJukoTime(TrainingTime trainingStartTime,TrainingTime trainingEndTime) {
+//		TrainingTime start = trainingTime.max(trainingStartTime,"09:00");
+//	}
 }

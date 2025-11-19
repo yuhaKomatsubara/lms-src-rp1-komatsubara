@@ -183,7 +183,6 @@ public class AttendanceUtil {
 	    if (trainingTimeHoure == null || trainingTimeHoure.isEmpty()) {
 	        return null;
 	    }
-//	    return Integer.parseInt(trainingTime.substring(0, 2));
 	    return trainingTimeHoure.substring(0, 2);
 	}
 
@@ -197,15 +196,8 @@ public class AttendanceUtil {
 		if(trainingTimeMinute == null || trainingTimeMinute.isEmpty()) {
 			return null;
 		}
-//		return Integer.parseInt(trainingTime.substring(trainingTime.length()-2));
 		return trainingTimeMinute.substring(trainingTimeMinute.length()-2);
 	}
 	
-	/**
-	 * Task.26 受講時間を算出
-	 * 小松原　2025/11/19
-	 */
-//	public TrainingTime calcJukoTime(TrainingTime trainingStartTime,TrainingTime trainingEndTime) {
-//		TrainingTime start = trainingTime.max(trainingStartTime,"09:00");
-//	}
+
 }

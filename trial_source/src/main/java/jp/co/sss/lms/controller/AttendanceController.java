@@ -14,6 +14,7 @@ import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
 import jp.co.sss.lms.service.StudentAttendanceService;
+import jp.co.sss.lms.util.AttendanceUtil;
 import jp.co.sss.lms.util.Constants;
 
 /**
@@ -29,6 +30,8 @@ public class AttendanceController {
 	private StudentAttendanceService studentAttendanceService;
 	@Autowired
 	private LoginUserDto loginUserDto;
+	@Autowired
+	AttendanceUtil attendanceUtil;
 
 	/**
 	 * 勤怠管理画面 初期表示
@@ -41,7 +44,7 @@ public class AttendanceController {
 	 */
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
 	public String index(Model model) throws ParseException {
-		//Take.25 過去日が未入力の場合の表示
+		//Take.25 過去日が未入力の場合の表示 小松原　2025/11/14
 		boolean notFlg = studentAttendanceService.notEnterCheck();
 		model.addAttribute("notEnterFlg",notFlg);
 		// 勤怠一覧の取得
@@ -118,7 +121,6 @@ public class AttendanceController {
 		AttendanceForm attendanceForm = studentAttendanceService
 				.setAttendanceForm(attendanceManagementDtoList);
 		model.addAttribute("attendanceForm", attendanceForm);
-
 		return "attendance/update";
 	}
 
@@ -134,8 +136,8 @@ public class AttendanceController {
 	@RequestMapping(path = "/update", params = "complete", method = RequestMethod.POST)
 	public String complete(AttendanceForm attendanceForm, Model model, BindingResult result)
 			throws ParseException {
-		//Take.26 出勤時間の入力方法変更
-		
+		//Take.26 出勤時間の入力方法変更 小松原　2025/11/18
+		studentAttendanceService.inInputMethodChange(attendanceForm);
 		
 		// 更新
 		String message = studentAttendanceService.update(attendanceForm);

@@ -221,6 +221,10 @@ public class StudentAttendanceService {
 		attendanceForm.setLeaveFlg(loginUserDto.getLeaveFlg());
 		attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
 
+		//Task.26 小松原 2025/11/18
+		attendanceForm.setHourTimes(attendanceUtil.setHourTime());
+		attendanceForm.setMinuteTimes(attendanceUtil.setMinuteTime());
+		
 		// 途中退校している場合のみ設定
 		if (loginUserDto.getLeaveDate() != null) {
 			attendanceForm
@@ -239,6 +243,19 @@ public class StudentAttendanceService {
 			dailyAttendanceForm
 					.setTrainingStartTime(attendanceManagementDto.getTrainingStartTime());
 			dailyAttendanceForm.setTrainingEndTime(attendanceManagementDto.getTrainingEndTime());
+
+			/**Task.26 小松原　2025/11/16
+			 * 出勤・退勤時間の時と分を設定
+			 */
+			dailyAttendanceForm.setTrainingStartTimeHour(
+					attendanceUtil.getHour(attendanceManagementDto.getTrainingStartTime()));
+			dailyAttendanceForm.setTrainingStartTimeMinute(
+					attendanceUtil.getMinute(attendanceManagementDto.getTrainingStartTime()));
+			dailyAttendanceForm.setTrainingEndTimeHour(
+					attendanceUtil.getHour(attendanceManagementDto.getTrainingEndTime()));
+			dailyAttendanceForm.setTrainingEndTimeMinute(
+					attendanceUtil.getMinute(attendanceManagementDto.getTrainingEndTime()));
+
 			if (attendanceManagementDto.getBlankTime() != null) {
 				dailyAttendanceForm.setBlankTime(attendanceManagementDto.getBlankTime());
 				dailyAttendanceForm.setBlankTimeValue(String.valueOf(
@@ -252,6 +269,7 @@ public class StudentAttendanceService {
 					.dateToString(attendanceManagementDto.getTrainingDate(), "yyyy年M月d日(E)"));
 			dailyAttendanceForm.setStatusDispName(attendanceManagementDto.getStatusDispName());
 
+			
 			attendanceForm.getAttendanceList().add(dailyAttendanceForm);
 		}
 
@@ -294,6 +312,8 @@ public class StudentAttendanceService {
 			}
 			tStudentAttendance.setLmsUserId(lmsUserId);
 			tStudentAttendance.setAccountId(loginUserDto.getAccountId());
+
+			
 			// 出勤時刻整形
 			TrainingTime trainingStartTime = null;
 			trainingStartTime = new TrainingTime(dailyAttendanceForm.getTrainingStartTime());
@@ -335,7 +355,7 @@ public class StudentAttendanceService {
 		return messageUtil.getMessage(Constants.PROP_KEY_ATTENDANCE_UPDATE_NOTICE);
 	}
 
-	//Take.25 過去の入力チェック
+	//Take.25 過去の入力チェック　小松原 2025/11/14
 	public Boolean notEnterCheck() throws ParseException {
 		//日付のフォーマットをyyyy-MM-ddに
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -351,5 +371,30 @@ public class StudentAttendanceService {
 			return false; // 未入力がない場合
 		}
 	}
+
+	/**
+	 * Task.26 小松原　2025/11/19
+	 * 開始・終了時間が入っているときHH:MMの形式に
+	 */
+	public void inInputMethodChange(AttendanceForm attendanceForm) {
+	    for (DailyAttendanceForm dailyAttendanceForm : attendanceForm.getAttendanceList()) {
+
+	    	if(!(dailyAttendanceForm.getTrainingStartTimeHour() ==null) && 
+					!(dailyAttendanceForm.getTrainingStartTimeHour().isEmpty()) &&
+					!(dailyAttendanceForm.getTrainingStartTimeMinute() == null) &&
+					!(dailyAttendanceForm.getTrainingStartTimeMinute().isEmpty())){			
+			dailyAttendanceForm.setTrainingStartTime(dailyAttendanceForm.getTrainingStartTimeHour() 
+					+ ":" + dailyAttendanceForm.getTrainingStartTimeMinute());
+			}
+			if(!(dailyAttendanceForm.getTrainingEndTimeHour() ==null) && 
+					!(dailyAttendanceForm.getTrainingEndTimeHour().isEmpty()) &&
+					!(dailyAttendanceForm.getTrainingEndTimeMinute() == null) &&
+					!(dailyAttendanceForm.getTrainingEndTimeMinute().isEmpty())){	
+			dailyAttendanceForm.setTrainingEndTime(dailyAttendanceForm.getTrainingEndTimeHour() 
+					+ ":" + dailyAttendanceForm.getTrainingEndTimeMinute());
+			}
+			}
+	}
+
 
 }

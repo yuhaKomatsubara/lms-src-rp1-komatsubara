@@ -88,7 +88,9 @@
 		}
 		
 		//Task.25 過去日が未入力の場合
+		//画面（HTML）が読み込み終わったタイミングで処理を実行
 			$(document).ready(function () {
+				//サーバーから渡ってきた値をチェック
 			if (/*[[${notEnterFlg}]]*/notEnterFlg) {
 				alert('過去日の勤怠に未入力があります。');
 			}

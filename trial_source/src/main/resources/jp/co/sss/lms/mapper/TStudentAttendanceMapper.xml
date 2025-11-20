@@ -86,7 +86,8 @@
 		WHERE student_attendance_id = #{studentAttendanceId}
 	</update>
 	
-	<!-- Take.25 -->
+	<!-- Take.25 小松原 2025/11/14-->
+	<!--過去日で、開始または終了時間が未入力の件数をカウント-->
 	<select id="notEnterCount" resultType="Integer">
 		SELECT COUNT(*)
 		FROM t_student_attendance

@@ -45,6 +45,7 @@ public class AttendanceController {
 		//Take.25 過去日が未入力の場合の表示 小松原　2025/11/14
 		boolean notFlg = studentAttendanceService.notEnterCheck();
 		model.addAttribute("notEnterFlg",notFlg);
+		
 		// 勤怠一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());

@@ -43,8 +43,8 @@ public class AttendanceController {
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
 	public String index(Model model) throws ParseException {
 		//Take.25 過去日が未入力の場合の表示 小松原　2025/11/14
-		boolean notFlg = studentAttendanceService.notEnterCheck();
-		model.addAttribute("notEnterFlg",notFlg);
+		boolean hasNotEnter = studentAttendanceService.notEnterCheck();
+		model.addAttribute("notEnterFlg",hasNotEnter);
 		
 		// 勤怠一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService

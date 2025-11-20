@@ -224,7 +224,7 @@ public class StudentAttendanceService {
 		//Task.26 小松原 2025/11/18
 		attendanceForm.setHourTimes(attendanceUtil.setHourTime());
 		attendanceForm.setMinuteTimes(attendanceUtil.setMinuteTime());
-		
+
 		// 途中退校している場合のみ設定
 		if (loginUserDto.getLeaveDate() != null) {
 			attendanceForm
@@ -269,7 +269,6 @@ public class StudentAttendanceService {
 					.dateToString(attendanceManagementDto.getTrainingDate(), "yyyy年M月d日(E)"));
 			dailyAttendanceForm.setStatusDispName(attendanceManagementDto.getStatusDispName());
 
-			
 			attendanceForm.getAttendanceList().add(dailyAttendanceForm);
 		}
 
@@ -313,7 +312,6 @@ public class StudentAttendanceService {
 			tStudentAttendance.setLmsUserId(lmsUserId);
 			tStudentAttendance.setAccountId(loginUserDto.getAccountId());
 
-			
 			// 出勤時刻整形
 			TrainingTime trainingStartTime = null;
 			trainingStartTime = new TrainingTime(dailyAttendanceForm.getTrainingStartTime());
@@ -355,7 +353,12 @@ public class StudentAttendanceService {
 		return messageUtil.getMessage(Constants.PROP_KEY_ATTENDANCE_UPDATE_NOTICE);
 	}
 
-	//Take.25 過去の入力チェック　小松原 2025/11/14
+	/**
+	 * 過去の入力チェック
+	 * @author 小松原　Task.25 2025/11/14
+	 * @return
+	 * @throws ParseException
+	 */
 	public Boolean notEnterCheck() throws ParseException {
 		//日付のフォーマットをyyyy-MM-ddに
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -365,36 +368,31 @@ public class StudentAttendanceService {
 		Date trainingDate = sdf.parse(sdf.format(date));
 		Integer notEnterCount = tStudentAttendanceMapper.notEnterCount(loginUserDto.getLmsUserId(),
 				Constants.DB_FLG_FALSE, trainingDate);
-		if (notEnterCount > 0) {
-			return true; // 未入力が1件以上ある場合
-		} else {
-			return false; // 未入力がない場合
-		}
+		return notEnterCount > 0;
+
 	}
 
 	/**
-	 * Task.26 小松原　2025/11/19
 	 * 開始・終了時間が入っているときHH:MMの形式に
+	 * @author 小松原　Task.26 2025/11/19
 	 */
 	public void inInputMethodChange(AttendanceForm attendanceForm) {
-	    for (DailyAttendanceForm dailyAttendanceForm : attendanceForm.getAttendanceList()) {
+		for (DailyAttendanceForm dailyAttendanceForm : attendanceForm.getAttendanceList()) {
 
-	    	if(!(dailyAttendanceForm.getTrainingStartTimeHour() ==null) && 
+			if (!(dailyAttendanceForm.getTrainingStartTimeHour() == null) &&
 					!(dailyAttendanceForm.getTrainingStartTimeHour().isEmpty()) &&
 					!(dailyAttendanceForm.getTrainingStartTimeMinute() == null) &&
-					!(dailyAttendanceForm.getTrainingStartTimeMinute().isEmpty())){			
-			dailyAttendanceForm.setTrainingStartTime(dailyAttendanceForm.getTrainingStartTimeHour() 
-					+ ":" + dailyAttendanceForm.getTrainingStartTimeMinute());
+					!(dailyAttendanceForm.getTrainingStartTimeMinute().isEmpty())) {
+				dailyAttendanceForm.setTrainingStartTime(dailyAttendanceForm.getTrainingStartTimeHour()
+						+ ":" + dailyAttendanceForm.getTrainingStartTimeMinute());
 			}
-			if(!(dailyAttendanceForm.getTrainingEndTimeHour() ==null) && 
+			if (!(dailyAttendanceForm.getTrainingEndTimeHour() == null) &&
 					!(dailyAttendanceForm.getTrainingEndTimeHour().isEmpty()) &&
 					!(dailyAttendanceForm.getTrainingEndTimeMinute() == null) &&
-					!(dailyAttendanceForm.getTrainingEndTimeMinute().isEmpty())){	
-			dailyAttendanceForm.setTrainingEndTime(dailyAttendanceForm.getTrainingEndTimeHour() 
-					+ ":" + dailyAttendanceForm.getTrainingEndTimeMinute());
+					!(dailyAttendanceForm.getTrainingEndTimeMinute().isEmpty())) {
+				dailyAttendanceForm.setTrainingEndTime(dailyAttendanceForm.getTrainingEndTimeHour()
+						+ ":" + dailyAttendanceForm.getTrainingEndTimeMinute());
 			}
-			}
+		}
 	}
-
-
 }

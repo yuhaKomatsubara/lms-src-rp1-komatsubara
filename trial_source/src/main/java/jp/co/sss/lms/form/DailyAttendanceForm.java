@@ -22,7 +22,7 @@ public class DailyAttendanceForm {
 	private String trainingEndTime;
 	
 	/**
-	 * Task.26 小松原 2025/11/18
+	 *@author 小松原 Task.26  2025/11/18
 	 */
 	/** 出勤時間 （時） */
 	private String trainingStartTimeHour;

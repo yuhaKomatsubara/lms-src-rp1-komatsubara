@@ -14,6 +14,7 @@ import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
 import jp.co.sss.lms.service.StudentAttendanceService;
+import jp.co.sss.lms.util.AttendanceUtil;
 import jp.co.sss.lms.util.Constants;
 
 /**
@@ -29,6 +30,12 @@ public class AttendanceController {
 	private StudentAttendanceService studentAttendanceService;
 	@Autowired
 	private LoginUserDto loginUserDto;
+	/*
+	 * Task.27 小松原　2025/11/21
+	 */
+	@Autowired
+	AttendanceUtil attendanceUtil;
+	
 
 
 	/**
@@ -137,6 +144,18 @@ public class AttendanceController {
 			throws ParseException {
 		//Take.26 出勤時間の入力方法変更 小松原　2025/11/18
 		studentAttendanceService.inInputMethodChange(attendanceForm);
+		
+		//Task.27 入力チェック　小松原 2025/11/21
+		studentAttendanceService.validationErrorCheck(attendanceForm,result);
+		//エラーが発生している場合
+		if(result.hasErrors()) {
+				attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
+				attendanceForm.setMinuteTimes(attendanceUtil.setMinuteTime());
+				attendanceForm.setHourTimes(attendanceUtil.setHourTime());
+				model.addAttribute("attendanceForm", attendanceForm);
+				
+				return "attendance/update";
+		}
 		
 		// 更新
 		String message = studentAttendanceService.update(attendanceForm);

@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
@@ -392,6 +393,72 @@ public class StudentAttendanceService {
 					!(dailyAttendanceForm.getTrainingEndTimeMinute().isEmpty())) {
 				dailyAttendanceForm.setTrainingEndTime(dailyAttendanceForm.getTrainingEndTimeHour()
 						+ ":" + dailyAttendanceForm.getTrainingEndTimeMinute());
+			}
+		}
+	}
+
+	/**
+	 * 勤怠入力チェック
+	 * @author 小松原　Task.27 2025/11/21
+	 */
+	public void validationErrorCheck(AttendanceForm attendanceForm, BindingResult result) {
+		//勤怠リストを一件ずつ取得する
+		for (int i = 0; i < attendanceForm.getAttendanceList().size(); i++) {
+			//i番目のDailyAttendanceFormを取得する
+			DailyAttendanceForm form = attendanceForm.getAttendanceList().get(i);
+
+			//a.備考の文字数をチェック（100文字）
+			if (!(form.getNote().isEmpty()) && form.getNote().length() > 100) {
+				result.rejectValue(
+				        "attendanceList[" + i + "].note",   // フィールド名
+				        Constants.VALID_KEY_MAXLENGTH,      // メッセージID
+				        new String[]{"備考", "100"},        // プレースホルダ
+				        null                                // デフォルトメッセージ
+				);
+
+				System.out.println("文字数が100文字超えています");
+
+			}
+
+			//b.出勤時間の片方だけ入力（分）
+			if (form.getTrainingStartTimeHour().isEmpty() && form.getTrainingStartTimeMinute() != null) {
+				System.out.println("開始時刻の「時」が未入力です");
+			}
+
+			//b.出勤時間の片方だけ入力（時間）
+			if (form.getTrainingStartTimeHour() != null && form.getTrainingStartTimeMinute().isEmpty()) {
+				System.out.println("開始時刻の「分」が未入力です");
+			}
+
+			//c.退勤時間の片方だけ入力（分）
+			if (form.getTrainingEndTimeHour().isEmpty() && form.getTrainingEndTimeMinute() != null) {
+				System.out.println("退勤時刻の「時」が未入力です");
+			}
+
+			//c.退勤時間の片方だけ入力（時間）
+			if (form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute().isEmpty()) {
+				System.out.println("退勤時刻の「分」が未入力です");
+			}
+			
+			//d.出勤なしで退勤あり
+			if(form.getTrainingStartTimeHour().isEmpty() && form.getTrainingStartTimeMinute().isEmpty()
+					&& form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null) {
+				System.out.println("出勤時刻が未入力です");
+				
+			}
+
+			//e.出勤時間が退勤時間より後
+			if (form.getTrainingStartTimeHour() != null && form.getTrainingStartTimeMinute() != null
+	                && form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null) {
+				System.out.println("出勤時刻が退勤時刻より後です");
+				
+			}
+
+			//f.中抜け時間が出勤時間より長い
+			if (form.getTrainingStartTimeHour() != null && form.getTrainingStartTimeMinute() != null
+			        && form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null
+			        && form.getBlankTime() != null) {
+				System.out.println("中抜け時間が出勤よりも長いです");
 			}
 		}
 	}

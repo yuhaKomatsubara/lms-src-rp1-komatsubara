@@ -32,7 +32,9 @@ public class AttendanceForm {
 	/** 日次の勤怠フォームリスト */
 	private List<DailyAttendanceForm> attendanceList;
 	
-	/*2025/11/18
+	/**
+	 *@author 小松原 Task.26 2025/11/18
+	 */
 	/**Task.26 小松原　 時間*/
 	private LinkedHashMap<Integer,String>hourTimes;
 	/**Task.26  小松原　分*/

@@ -21,9 +21,15 @@
 
 	<div class="row">
 		<div class="bs-component col-sm-12">
-			
-			<!--Task.27 入力チェック　小松原　2025/11/21-->
-			
+
+			<!-- Task.27 小松原　入力チェック表示 2025/11/25-->
+			<ul style="padding-left: 0; list-style: none;">
+				<li th:each="error : ${#fields.detailedErrors()}">
+					<span th:if="${!#strings.isEmpty(error.message)}" class="help-inline error">
+						*&nbsp;[[${error.message}]]
+					</span>
+				</li>
+			</ul>
 
 			<form th:action="@{/attendance/update}" method="post">
 				<table class="table table-hover dataTable no-footer">
@@ -64,7 +70,8 @@
 
 								<td class="w60"><input type="button" class="btn btn-success" value="定時" /></td>
 
-								<!--小松原　Take.26 出勤時間の入力方法変更-->
+								<!--Take.26 出勤時間の入力方法変更 小松原　-->
+								<!-- Task.27 入力チェック　小松原　2025/11/25 -->
 								<td class="w70">
 									<select th:name="|attendanceList[${stat.index}].trainingStartTimeHour|"
 										class="form-control">
@@ -118,7 +125,7 @@
 											[[${blankTime.value}]]</option>
 									</select>
 
-									</select>
+
 								</td>
 								<td class="w70">[[${dailyAttendanceForm.statusDispName}]]</td>
 								<td class="w140">
@@ -138,12 +145,21 @@
 					<th:block th:if="${session.loginUserDto.role != '0001'}">
 						<input type="submit" value="戻る" name="indexCompany" class="btn btn-default" />
 					</th:block>
-					<input type="submit" value="更新" name="complete" class="btn btn-info" />
+					<input type="submit" th:value="更新" th:name="complete" class="btn btn-info update-button" />
 				</div>
 
 			</form>
 		</div>
 	</div>
+
+	<script>
+		// Task.27 確認ダイアログの追加 小松原　2025/11/25
+		$(function () {
+			$(".update-button").click(function () {
+				confirm("更新します。よろしいですか？");
+			});
+		});
+	</script>
 
 </body>
 

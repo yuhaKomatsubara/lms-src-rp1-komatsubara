@@ -410,55 +410,88 @@ public class StudentAttendanceService {
 			//a.備考の文字数をチェック（100文字）
 			if (!(form.getNote().isEmpty()) && form.getNote().length() > 100) {
 				result.rejectValue(
-				        "attendanceList[" + i + "].note",   // フィールド名
-				        Constants.VALID_KEY_MAXLENGTH,      // メッセージID
-				        new String[]{"備考", "100"},        // プレースホルダ
-				        null                                // デフォルトメッセージ
+						"attendanceList[" + i + "].note", // フィールド名
+						Constants.VALID_KEY_MAXLENGTH, // メッセージID
+						new String[] { "備考", "100" }, // プレースホルダ
+						"不正な入力です。" // デフォルトメッセージ
 				);
-
-				System.out.println("文字数が100文字超えています");
 
 			}
 
 			//b.出勤時間の片方だけ入力（分）
 			if (form.getTrainingStartTimeHour().isEmpty() && form.getTrainingStartTimeMinute() != null) {
-				System.out.println("開始時刻の「時」が未入力です");
+				result.rejectValue("attendanceList[" + i + "].trainingStartTimeHour",
+						Constants.INPUT_INVALID,
+						new String[] { "出勤時間" }, "不正な入力です。");
 			}
 
 			//b.出勤時間の片方だけ入力（時間）
 			if (form.getTrainingStartTimeHour() != null && form.getTrainingStartTimeMinute().isEmpty()) {
-				System.out.println("開始時刻の「分」が未入力です");
+				result.rejectValue("attendanceList[" + i + "].trainingStartTimeMinute", 
+						Constants.INPUT_INVALID,
+						new String[] {"出勤時間"},"不正な入力です");
 			}
 
 			//c.退勤時間の片方だけ入力（分）
 			if (form.getTrainingEndTimeHour().isEmpty() && form.getTrainingEndTimeMinute() != null) {
-				System.out.println("退勤時刻の「時」が未入力です");
+				result.rejectValue("attendanceList[" + i + "].trainingEndTimeHour", 
+						Constants.INPUT_INVALID,
+						new String[] {"退勤時間"},"不正な入力です");
 			}
 
 			//c.退勤時間の片方だけ入力（時間）
 			if (form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute().isEmpty()) {
-				System.out.println("退勤時刻の「分」が未入力です");
+				result.rejectValue("attendanceList[" + i + "].trainingEndTimeMinute", 
+						Constants.INPUT_INVALID,
+						new String[] {"退勤時間"},"不正な入力です");
+
 			}
-			
+
 			//d.出勤なしで退勤あり
-			if(form.getTrainingStartTimeHour().isEmpty() && form.getTrainingStartTimeMinute().isEmpty()
+			if (form.getTrainingStartTimeHour().isEmpty() && form.getTrainingStartTimeMinute().isEmpty()
 					&& form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null) {
-				System.out.println("出勤時刻が未入力です");
+				result.rejectValue("attendanceList[" + i + "].trainingStartTimeHour", Constants.VALID_KEY_ATTENDANCE_PUNCHINEMPTY, 
+						"不正な入力です。");
+				result.rejectValue("attendanceList[" + i + "].trainingStartTimeMinute", "start_error", "");
 				
+
 			}
 
 			//e.出勤時間が退勤時間より後
 			if (form.getTrainingStartTimeHour() != null && form.getTrainingStartTimeMinute() != null
-	                && form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null) {
-				System.out.println("出勤時刻が退勤時刻より後です");
+					&& form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null) {
 				
+
+	            int startTime = Integer.parseInt(form.getTrainingStartTimeHour()) * 60
+	                    + Integer.parseInt(form.getTrainingStartTimeMinute());
+	            
+	            int endTime = Integer.parseInt(form.getTrainingEndTimeHour()) * 60
+	                    + Integer.parseInt(form.getTrainingEndTimeMinute());
+	            
+	            if (startTime > endTime) {
+	                result.rejectValue("attendanceList[" + i + "].trainingEndTimeHour",
+	                		Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE,
+	                		new Object[] {i}, "不正な入力です。");
+	            }
+	            
+
 			}
 
 			//f.中抜け時間が出勤時間より長い
 			if (form.getTrainingStartTimeHour() != null && form.getTrainingStartTimeMinute() != null
-			        && form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null
-			        && form.getBlankTime() != null) {
-				System.out.println("中抜け時間が出勤よりも長いです");
+					&& form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null
+					&& form.getBlankTime() != null) {
+				
+				int startTime = Integer.parseInt(form.getTrainingStartTimeHour()) * 60
+	                    + Integer.parseInt(form.getTrainingStartTimeMinute());
+	            int endTime = Integer.parseInt(form.getTrainingEndTimeHour()) * 60
+	                    + Integer.parseInt(form.getTrainingEndTimeMinute());
+
+	            if (form.getBlankTime() > (endTime - startTime)) {
+	            	result.rejectValue("attendanceList[" + i + "].blankTime", Constants.VALID_KEY_ATTENDANCE_BLANKTIMEERROR, 
+							"不正な入力です。");
+	            }
+
 			}
 		}
 	}

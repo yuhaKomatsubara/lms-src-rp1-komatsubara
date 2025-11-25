@@ -152,6 +152,8 @@ public class AttendanceController {
 				attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
 				attendanceForm.setMinuteTimes(attendanceUtil.setMinuteTime());
 				attendanceForm.setHourTimes(attendanceUtil.setHourTime());
+
+				
 				model.addAttribute("attendanceForm", attendanceForm);
 				
 				return "attendance/update";

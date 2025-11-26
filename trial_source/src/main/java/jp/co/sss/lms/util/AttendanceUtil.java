@@ -179,23 +179,23 @@ public class AttendanceUtil {
 	 * Task.26 時間だけを切り出す
 	 * 小松原　2025/11/18
 	 */
-	public String getHour(String trainingTimeHoure) {
+	public Integer getHour(String trainingTimeHoure) {
 		if (trainingTimeHoure == null || trainingTimeHoure.isEmpty()) {
 			return null;
 		}
-		return trainingTimeHoure.substring(0, 2);
+		return Integer.parseInt(trainingTimeHoure.substring(0, 2));
 	}
 
 	/**
 	 * Task.26 分だけを切り出す
 	 * 小松原　2025/11/18
 	 */
-	public String getMinute(String trainingTimeMinute) {
+	public Integer getMinute(String trainingTimeMinute) {
 		//nullや空文字、スペースはnull
 		if (trainingTimeMinute == null || trainingTimeMinute.isEmpty()) {
 			return null;
 		}
-		return trainingTimeMinute.substring(trainingTimeMinute.length() - 2);
+		return Integer.parseInt(trainingTimeMinute.substring(trainingTimeMinute.length() - 2));
 	}
 
 	/**

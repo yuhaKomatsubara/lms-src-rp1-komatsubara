@@ -148,56 +148,109 @@ public class AttendanceUtil {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Task.26 時間のマップ
 	 * 小松原　2025/11/18
 	 */
-	public LinkedHashMap<Integer,String>setHourTime(){
-		LinkedHashMap<Integer,String>hourTime = new LinkedHashMap<>();
+	public LinkedHashMap<Integer, String> setHourTime() {
+		LinkedHashMap<Integer, String> hourTime = new LinkedHashMap<>();
 		hourTime.put(null, "");
-		for(int i = 0;i<24;i++) {
-			hourTime.put(i,String.format("%02d", i));
+		for (int i = 0; i < 24; i++) {
+			hourTime.put(i, String.format("%02d", i));
 		}
 		return hourTime;
 	}
-	
+
 	/**
 	 * Task.26 分のマップ
 	 * 小松原　2025/11/18
 	 */
-	public LinkedHashMap<Integer,String>setMinuteTime(){
-		LinkedHashMap<Integer,String>miniteTime = new LinkedHashMap<>();
+	public LinkedHashMap<Integer, String> setMinuteTime() {
+		LinkedHashMap<Integer, String> miniteTime = new LinkedHashMap<>();
 		miniteTime.put(null, "");
-		for(int i = 0;i<60;i++) {
-			miniteTime.put(i,String.format("%02d", i));
+		for (int i = 0; i < 60; i++) {
+			miniteTime.put(i, String.format("%02d", i));
 		}
 		return miniteTime;
 	}
-	
+
 	/**
 	 * Task.26 時間だけを切り出す
 	 * 小松原　2025/11/18
 	 */
 	public String getHour(String trainingTimeHoure) {
-	    if (trainingTimeHoure == null || trainingTimeHoure.isEmpty()) {
-	        return null;
-	    }
-	    return trainingTimeHoure.substring(0, 2);
+		if (trainingTimeHoure == null || trainingTimeHoure.isEmpty()) {
+			return null;
+		}
+		return trainingTimeHoure.substring(0, 2);
 	}
 
-	
 	/**
 	 * Task.26 分だけを切り出す
 	 * 小松原　2025/11/18
 	 */
 	public String getMinute(String trainingTimeMinute) {
 		//nullや空文字、スペースはnull
-		if(trainingTimeMinute == null || trainingTimeMinute.isEmpty()) {
+		if (trainingTimeMinute == null || trainingTimeMinute.isEmpty()) {
 			return null;
 		}
-		return trainingTimeMinute.substring(trainingTimeMinute.length()-2);
+		return trainingTimeMinute.substring(trainingTimeMinute.length() - 2);
+	}
+
+	/**
+	 * 受講時間の算出
+	 * @author 小松原　Task.27 2025/11/26
+	 */
+	public TrainingTime attendingTimeCalculation(TrainingTime trainingStartTime, TrainingTime trainingEndTime) {
+		// 就業時間と定時のうち遅い方を、受講開始時間
+		TrainingTime startTime = trainingTime.max(trainingStartTime, Constants.SSS_WORK_START_TIME);
+		// 就業時間と定時のうち早い方を、受講終了時間
+		TrainingTime endTime = trainingTime.min(trainingEndTime, Constants.SSS_WORK_END_TIME);
+		// 休憩開始と就業時間のうち早いのを、午前の終了時間
+		TrainingTime firstHalfEndTime = trainingTime.min(trainingEndTime,
+				Constants.SSS_REST_START_TIME);
+		// 休憩終了と就業時間のうち遅いのを、午後の開始時間
+		TrainingTime lastHalfStartTime = trainingTime.max(trainingStartTime,
+				Constants.SSS_REST_END_TIME);
+		// 前半と、後半の有効時間を足した結果を取得
+		TrainingTime total = amPMTotalTime(startTime, endTime, firstHalfEndTime,
+				lastHalfStartTime);
+		return total;
 	}
 	
+	
+	/**
+	 * 午前・午後の勤務時間の計算
+	 * @author 小松原　Task.27 2025/11/26
+	 * @param trainingStartTime
+	 * @param trainingEndTime
+	 * @param firstHalfEndTime
+	 * @param lastHalfStartTime
+	 * @return
+	 */
+	public TrainingTime amPMTotalTime(TrainingTime trainingStartTime, TrainingTime trainingEndTime,
+			TrainingTime firstHalfEndTime, TrainingTime lastHalfStartTime) {
+		TrainingTime firstHalf = new TrainingTime(0, 0);
+		TrainingTime lastHalf = new TrainingTime(0, 0);
+		//「午前の終了時間 > 勤務開始時間」の場合のみ午前勤務が発生
+		if (firstHalfEndTime.compareTo(trainingStartTime) > 0) {
+			// 午前勤務時間 = 午前終了時間 - 勤務開始時間
+			firstHalf = firstHalfEndTime.subtract(trainingStartTime);
+		}
+		// 「午後開始時間 < 勤務終了時間」の場合
+		if (lastHalfStartTime.compareTo(trainingEndTime) < 0) {
+			// 午後勤務時間 = 勤務終了時間 - 午後開始時間
+			lastHalf = trainingEndTime.subtract(lastHalfStartTime);
+		}
+		TrainingTime total = firstHalf.add(lastHalf);
+		return total;
+	}
+
+
+
+
+
+
 
 }

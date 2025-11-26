@@ -35,8 +35,6 @@ public class AttendanceController {
 	 */
 	@Autowired
 	AttendanceUtil attendanceUtil;
-	
-
 
 	/**
 	 * 勤怠管理画面 初期表示
@@ -51,8 +49,8 @@ public class AttendanceController {
 	public String index(Model model) throws ParseException {
 		//Take.25 過去日が未入力の場合の表示 小松原　2025/11/14
 		boolean hasNotEnter = studentAttendanceService.notEnterCheck();
-		model.addAttribute("notEnterFlg",hasNotEnter);
-		
+		model.addAttribute("notEnterFlg", hasNotEnter);
+
 		// 勤怠一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
@@ -126,6 +124,7 @@ public class AttendanceController {
 		// 勤怠フォームの生成
 		AttendanceForm attendanceForm = studentAttendanceService
 				.setAttendanceForm(attendanceManagementDtoList);
+
 		model.addAttribute("attendanceForm", attendanceForm);
 		return "attendance/update";
 	}
@@ -144,21 +143,30 @@ public class AttendanceController {
 			throws ParseException {
 		//Take.26 出勤時間の入力方法変更 小松原　2025/11/18
 		studentAttendanceService.inInputMethodChange(attendanceForm);
-		
-		//Task.27 入力チェック　小松原 2025/11/21
-		studentAttendanceService.validationErrorCheck(attendanceForm,result);
-		//エラーが発生している場合
-		if(result.hasErrors()) {
-				attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
-				attendanceForm.setMinuteTimes(attendanceUtil.setMinuteTime());
-				attendanceForm.setHourTimes(attendanceUtil.setHourTime());
 
-				
-				model.addAttribute("attendanceForm", attendanceForm);
-				
-				return "attendance/update";
+		//Task.27 入力チェック　小松原 2025/11/21
+		studentAttendanceService.validationErrorCheck(attendanceForm, result);
+		//エラーが発生している場合
+		if (result.hasErrors()) {
+			attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
+			attendanceForm.setMinuteTimes(attendanceUtil.setMinuteTime());
+			attendanceForm.setHourTimes(attendanceUtil.setHourTime());
+
+			System.out.println("---- GET /update ----");
+			System.out.println("attendanceForm = " + attendanceForm);
+			if (attendanceForm.getAttendanceList() != null) {
+				for (int i = 0; i < attendanceForm.getAttendanceList().size(); i++) {
+					System.out.println("attendanceList[" + i + "] = " + attendanceForm.getAttendanceList().get(i));
+				}
+			}
+
+			model.addAttribute("attendanceForm", attendanceForm);
+
+			System.out.println("入力エラーがあります");
+
+			return "attendance/update";
 		}
-		
+
 		// 更新
 		String message = studentAttendanceService.update(attendanceForm);
 		model.addAttribute("message", message);

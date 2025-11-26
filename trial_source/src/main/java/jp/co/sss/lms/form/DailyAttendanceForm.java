@@ -25,13 +25,13 @@ public class DailyAttendanceForm {
 	 *@author 小松原 Task.26  2025/11/18
 	 */
 	/** 出勤時間 （時） */
-	private String trainingStartTimeHour;
+	private Integer trainingStartTimeHour;
 	/** 出勤分 */
-	private String trainingStartTimeMinute;//Task.26 小松原
+	private Integer trainingStartTimeMinute;//Task.26 小松原
 	/** 退勤時間（時） */
-	private String trainingEndTimeHour;
+	private Integer trainingEndTimeHour;
 	/** 退勤分 */
-	private String trainingEndTimeMinute;//Task.26 小松原
+	private Integer trainingEndTimeMinute;//Task.26 小松原
 	
 	
 	/** 中抜け時間 */

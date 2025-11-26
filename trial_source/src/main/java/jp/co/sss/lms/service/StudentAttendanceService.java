@@ -382,19 +382,20 @@ public class StudentAttendanceService {
 		for (DailyAttendanceForm dailyAttendanceForm : attendanceForm.getAttendanceList()) {
 
 			if (!(dailyAttendanceForm.getTrainingStartTimeHour() == null) &&
-					!(dailyAttendanceForm.getTrainingStartTimeHour().isEmpty()) &&
-					!(dailyAttendanceForm.getTrainingStartTimeMinute() == null) &&
-					!(dailyAttendanceForm.getTrainingStartTimeMinute().isEmpty())) {
+					
+					!(dailyAttendanceForm.getTrainingStartTimeMinute() == null))
+					 {
 				dailyAttendanceForm.setTrainingStartTime(dailyAttendanceForm.getTrainingStartTimeHour()
 						+ ":" + dailyAttendanceForm.getTrainingStartTimeMinute());
 			}
 			if (!(dailyAttendanceForm.getTrainingEndTimeHour() == null) &&
-					!(dailyAttendanceForm.getTrainingEndTimeHour().isEmpty()) &&
-					!(dailyAttendanceForm.getTrainingEndTimeMinute() == null) &&
-					!(dailyAttendanceForm.getTrainingEndTimeMinute().isEmpty())) {
+				
+					!(dailyAttendanceForm.getTrainingEndTimeMinute() == null))
+					 {
 				dailyAttendanceForm.setTrainingEndTime(dailyAttendanceForm.getTrainingEndTimeHour()
 						+ ":" + dailyAttendanceForm.getTrainingEndTimeMinute());
 			}
+
 		}
 	}
 
@@ -403,115 +404,133 @@ public class StudentAttendanceService {
 	 * @author 小松原　Task.27 2025/11/21
 	 */
 	public void validationErrorCheck(AttendanceForm attendanceForm, BindingResult result) {
-		//勤怠リストを一件ずつ取得する
-		for (int i = 0; i < attendanceForm.getAttendanceList().size(); i++) {
-			//i番目のDailyAttendanceFormを取得する
-			DailyAttendanceForm form = attendanceForm.getAttendanceList().get(i);
+		System.out.println("=======================入力チェック==========================");
 
-			//a.備考の文字数をチェック（100文字）
-			if (!(form.getNote().isEmpty()) && form.getNote().length() > 100) {
-				result.addError(new FieldError(result.getObjectName(),
-						"attendanceList[" + i + "].note", // フィールド名
-						messageUtil.getMessage(
-						Constants.VALID_KEY_MAXLENGTH, // メッセージID
-						new String[] { "備考", "100" }
-				)));
-			}
+	    for (int i = 0; i < attendanceForm.getAttendanceList().size(); i++) {
 
-			//b.出勤時間の片方だけ入力（分）
-			if (form.getTrainingStartTimeHour().isEmpty() && form.getTrainingStartTimeMinute() != null) {
-				result.addError(new FieldError(result.getObjectName(),
-						"attendanceList[" + i + "].trainingStartTimeHour",
-						messageUtil.getMessage(
-						Constants.INPUT_INVALID,
-						new String[] { "出勤時間" }
-						)));
-			}
+	        DailyAttendanceForm form = attendanceForm.getAttendanceList().get(i);
 
-			//b.出勤時間の片方だけ入力（時間）
-			if (form.getTrainingStartTimeHour() != null && form.getTrainingStartTimeMinute().isEmpty()) {
-				result.addError(new FieldError(result.getObjectName(),
-						"attendanceList[" + i + "].trainingStartTimeMinute", 
-						messageUtil.getMessage(
-						Constants.INPUT_INVALID,
-						new String[] {"出勤時間"}
-						)));
-			}
+	        Integer startH = form.getTrainingStartTimeHour();
+	        Integer startM = form.getTrainingStartTimeMinute();
+	        Integer endH   = form.getTrainingEndTimeHour();
+	        Integer endM   = form.getTrainingEndTimeMinute();
 
-			//c.退勤時間の片方だけ入力（分）
-			if (form.getTrainingEndTimeHour().isEmpty() && form.getTrainingEndTimeMinute() != null) {
-				result.addError(new FieldError(result.getObjectName(),
-						"attendanceList[" + i + "].trainingEndTimeHour", 
-								messageUtil.getMessage(		
-						Constants.INPUT_INVALID,
-						new String[] {"退勤時間"}
-						)));
-			}
+	        // null or "" チェック
+	        boolean startHEmpty = (startH == null);
+	        boolean startMEmpty = (startM == null);
+	        boolean endHEmpty   = (endH == null);
+	        boolean endMEmpty   = (endM == null);
 
-			//c.退勤時間の片方だけ入力（時間）
-			if (form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute().isEmpty()) {
-				result.addError(new FieldError(result.getObjectName(),
-						"attendanceList[" + i + "].trainingEndTimeMinute", 
-						messageUtil.getMessage(	
-						Constants.INPUT_INVALID,
-						new String[] {"退勤時間"}
-						)));
+	 
+	        // a. 備考100文字
+	        if (form.getNote() != null && !form.getNote().isEmpty() && form.getNote().length() > 100) {
+	            result.addError(new FieldError(
+	                    result.getObjectName(),
+	                    "attendanceList[" + i + "].note",
+	                    messageUtil.getMessage(Constants.VALID_KEY_MAXLENGTH, new String[]{"備考", "100"})
+	            ));
+	            System.out.println("備考が100文字超えています");
+	        }
 
-			}
+	        // b. 出勤時間 片方だけ入力
+	        // 分だけ入力
+	        if (startHEmpty && !startMEmpty) {
+	            result.addError(new FieldError(
+	                    result.getObjectName(),
+	                    "attendanceList[" + i + "].trainingStartTimeHour",
+	                    messageUtil.getMessage(Constants.INPUT_INVALID, new String[]{"出勤時間"})
+	            ));
+	            System.out.println("出勤時間の「時」が入力されていないです。");
+	        }
 
-			//d.出勤なしで退勤あり
-			if (form.getTrainingStartTimeHour().isEmpty() && form.getTrainingStartTimeMinute().isEmpty()
-					&& form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null) {
-				result.addError(new FieldError(result.getObjectName(),
-						"attendanceList[" + i + "].trainingStartTimeHour",
-						messageUtil.getMessage(	
-						Constants.VALID_KEY_ATTENDANCE_PUNCHINEMPTY
-						)));
-				result.addError(new FieldError(result.getObjectName(),
-						"attendanceList[" + i + "].trainingStartTimeMinute", ""));
-			}
+	        // 時だけ入力
+	        if (!startHEmpty && startMEmpty) {
+	            result.addError(new FieldError(
+	                    result.getObjectName(),
+	                    "attendanceList[" + i + "].trainingStartTimeMinute",
+	                    messageUtil.getMessage(Constants.INPUT_INVALID, new String[]{"出勤時間"})
+	            ));
+	            System.out.println("出勤時間の「分」が入力されていないです。");
+	        }
+	        
+	        // c. 退勤時間 片方だけ入力
+	        // 分だけ入力
+	        if (endHEmpty && !endMEmpty) {
+	            result.addError(new FieldError(
+	                    result.getObjectName(),
+	                    "attendanceList[" + i + "].trainingEndTimeHour",
+	                    messageUtil.getMessage(Constants.INPUT_INVALID, new String[]{"退勤時間"})
+	            ));
+	            System.out.println("退勤時間の「時」が入力されていないです。");
+	        }
 
-			//e.出勤時間が退勤時間より後
-			if (form.getTrainingStartTimeHour() != null && !form.getTrainingStartTimeHour().isEmpty()
-			        && form.getTrainingStartTimeMinute() != null && !form.getTrainingStartTimeMinute().isEmpty()
-			        && form.getTrainingEndTimeHour() != null && !form.getTrainingEndTimeHour().isEmpty()
-			        && form.getTrainingEndTimeMinute() != null && !form.getTrainingEndTimeMinute().isEmpty()) {
+	        // 時だけ入力
+	        if (!endHEmpty && endMEmpty) {
+	            result.addError(new FieldError(
+	                    result.getObjectName(),
+	                    "attendanceList[" + i + "].trainingEndTimeMinute",
+	                    messageUtil.getMessage(Constants.INPUT_INVALID, new String[]{"退勤時間"})
+	            ));
+	            System.out.println("退勤時間の「分」が入力されていないです。");
+	        }
 
-			    int startTime = Integer.parseInt(form.getTrainingStartTimeHour()) * 60
-			                    + Integer.parseInt(form.getTrainingStartTimeMinute());
-			    int endTime = Integer.parseInt(form.getTrainingEndTimeHour()) * 60
-			                    + Integer.parseInt(form.getTrainingEndTimeMinute());
+	  
+	        // d. 出勤なしで退勤あり
+	        if (startHEmpty && startMEmpty && !endHEmpty && !endMEmpty) {
+	            result.addError(new FieldError(
+	                    result.getObjectName(),
+	                    "attendanceList[" + i + "].trainingStartTimeHour",
+	                    messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_PUNCHINEMPTY)
+	            ));
+	            result.addError(new FieldError(
+	                    result.getObjectName(),
+	                    "attendanceList[" + i + "].trainingStartTimeMinute",
+	                    ""
+	            ));
+	        }
 
-			    if (startTime > endTime) {
-			    	result.addError(new FieldError(result.getObjectName(),
-							"attendanceList[" + i + "].trainingEndTimeHour",
-							messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE,
-									new String[] { String.valueOf(i), String.valueOf(i) })));
-					result.addError(new FieldError(result.getObjectName(),
-							"attendanceList[" + i + "].trainingEndTimeMinute", ""));
-					continue;
-			    }
-			}
+	        // e. 出勤が退勤より遅い
+	        if (!startHEmpty && !startMEmpty && !endHEmpty && !endMEmpty) {
 
-			//f.中抜け時間が出勤時間より長い
-			if (form.getTrainingStartTimeHour() != null && form.getTrainingStartTimeMinute() != null
-					&& form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() != null
-					&& form.getBlankTime() != null) {
-				
-				int startTime = Integer.parseInt(form.getTrainingStartTimeHour()) * 60
-	                    + Integer.parseInt(form.getTrainingStartTimeMinute());
-	            int endTime = Integer.parseInt(form.getTrainingEndTimeHour()) * 60
-	                    + Integer.parseInt(form.getTrainingEndTimeMinute());
+	            int startTime = (startH) * 60 + (startM);
+	            int endTime   = (endH) * 60 + (endM);
+
+	            if (startTime > endTime) {
+	                result.addError(new FieldError(
+	                        result.getObjectName(),
+	                        "attendanceList[" + i + "].trainingEndTimeHour",
+	                        messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE,
+	                                new String[]{String.valueOf(i), String.valueOf(i)})
+	                ));
+	                result.addError(new FieldError(
+	                        result.getObjectName(),
+	                        "attendanceList[" + i + "].trainingEndTimeMinute",
+	                        ""
+	                ));
+	                System.out.println("出勤時間が退勤時間より遅いです");
+	                continue;
+	            }
+	        }
+	        
+	        // f. 中抜け時間が出勤時間より長い
+	        if (!startHEmpty && !startMEmpty && !endHEmpty && !endMEmpty
+	                && form.getBlankTime() != null) {
+
+	            int startTime = (startH) * 60 + (startM);
+	            int endTime   = (endH) * 60 + (endM);
 
 	            if (form.getBlankTime() > (endTime - startTime)) {
-	            	result.addError(new FieldError(result.getObjectName(),
-	            			"attendanceList[" + i + "].blankTime", 
-	            			messageUtil.getMessage(
-	            			Constants.VALID_KEY_ATTENDANCE_BLANKTIMEERROR
-							)));
+	                result.addError(new FieldError(
+	                        result.getObjectName(),
+	                        "attendanceList[" + i + "].blankTime",
+	                        messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_BLANKTIMEERROR)
+	                ));
+	                System.out.println("中抜け時間が退勤時刻より長いです");
 	            }
-
-			}
-		}
+	        }
+	    }
+	    System.out.println("============================================================");
 	}
+
+
 }
